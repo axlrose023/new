@@ -16,11 +16,12 @@ class CompanyViewTests(APITestCase):
         self.company = Company.objects.create(name="Test Company")
 
     def test_create_company(self):
+        initial_count = Company.objects.count()
         url = reverse('company_manage')
         data = {'name': 'New Company'}
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(Company.objects.count(), 2)
+        self.assertEqual(Company.objects.count(), initial_count + 1)
         self.assertEqual(Company.objects.get(id=response.data['id']).name, 'New Company')
 
     def test_patch_company(self):

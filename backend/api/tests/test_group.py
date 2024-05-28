@@ -15,7 +15,7 @@ class GroupViewTests(APITestCase):
         self.group = Group.objects.create(fb_id="12345", last_post_id="post123")
 
     def test_post_group(self):
-        url = reverse('group')
+        url = reverse('groups')
         data = {'fb_id': '67890', 'last_post_id': 'post678'}
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -23,7 +23,7 @@ class GroupViewTests(APITestCase):
         self.assertEqual(Group.objects.get(fb_id='67890').last_post_id, 'post678')
 
     def test_patch_group(self):
-        url = reverse('group') + '?id=' + str(self.group.id)
+        url = reverse('groups') + '?id=' + str(self.group.id)
         updated_data = {'last_post_id': 'updated_post'}
         response = self.client.patch(url, updated_data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -31,19 +31,19 @@ class GroupViewTests(APITestCase):
         self.assertEqual(self.group.last_post_id, 'updated_post')
 
     def test_delete_group(self):
-        url = reverse('group') + '?id=' + str(self.group.id)
+        url = reverse('groups') + '?id=' + str(self.group.id)
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         with self.assertRaises(Group.DoesNotExist):
             Group.objects.get(id=self.group.id)
 
     def test_error_on_missing_id_for_patch(self):
-        url = reverse('group')
+        url = reverse('groups')
         response = self.client.patch(url, {'last_post_id': 'fail_update'}, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_error_on_missing_id_for_delete(self):
-        url = reverse('group')
+        url = reverse('groups')
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 

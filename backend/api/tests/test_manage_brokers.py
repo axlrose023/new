@@ -21,14 +21,14 @@ class BrokerManagementTestCase(APITestCase):
             fb_id="fb001",
             is_activated=True,
             fb_link="http://link1.com",
-            user=self.company_user,
+            # user=self.company_user,
             company=self.company
         )
         self.broker2 = Broker.objects.create(
             fb_id="fb002",
             is_activated=False,
             fb_link="http://link2.com",
-            user=self.company_user,
+            # user=self.company_user,
             company=self.company
         )
 
