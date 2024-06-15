@@ -66,7 +66,7 @@ def detect_new_post_per_account(fake_account: dict, keywords: dict):
     brokers = Broker.objects.filter(is_active=True, company__is_active=True)
 
     for broker in brokers:
-        broker_keywords = broker.keywords.filter(is_active=True, keywordbroker__is_active=True).distinct()
+        broker_keywords = list(broker.keywords.filter(is_active=True, keywordbroker__is_active=True).distinct().values_list('name', flat=True))
         correct_leads = [lead for lead in leads if lead.matches_keyword(broker_keywords)]
         send_new_posts.apply_async(([str(lead) for lead in correct_leads], broker.fb_id))
 
