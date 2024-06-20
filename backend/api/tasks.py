@@ -54,7 +54,6 @@ def detect_new_post_per_account(fake_account: dict, keywords: dict):
 
             post.post_keywords = detected_keywords
             post.generated_message = openai_service.generate_response(post.post_text)
-
             last_post_id = post.post_id
 
         if last_post_id:
@@ -66,11 +65,21 @@ def detect_new_post_per_account(fake_account: dict, keywords: dict):
 
     leads = [post for posts in recent_posts.values() for post in posts if post.generated_message]
     brokers = Broker.objects.filter(is_active=True, company__is_active=True)
-
     for broker in brokers:
         broker_keywords = list(broker.keywords.filter(is_active=True, keywordbroker__is_active=True).distinct().values_list('name', flat=True))
         correct_leads = [lead for lead in leads if lead.matches_keyword(broker_keywords)]
-        send_new_posts.apply_async(([str(lead) for lead in correct_leads], broker.fb_id))
+        leads_to_send = []
+        for lead in correct_leads:
+            lead_id = lead.post_id  # Use post_id as a unique identifier for the lead
+            redis_key = f"sent_leads:{broker.fb_id}"
+            if not redis_client.sismember(redis_key, lead_id):
+                leads_to_send.append(str(lead))
+                redis_client.sadd(redis_key, lead_id)
+
+        if leads_to_send:
+            send_new_posts.apply_async((leads_to_send, broker.fb_id))
+
+        
 
 
 @shared_task
