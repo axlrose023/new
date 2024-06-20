@@ -11,8 +11,10 @@ from api.services.fb_messenger import FBMessengerService
 from api.services.openai_service import OpenAIService
 from api.services.scrapper import Scrapper
 
-logger = logging.getLogger(__name__)
+import redis
 
+logger = logging.getLogger(__name__)
+redis_client = redis.Redis(host='redis', port=6379, db=0)
 
 @shared_task
 def healthcheck():
