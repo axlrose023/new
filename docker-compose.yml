@@ -46,6 +46,13 @@ services:
     command: celery -A backend beat -l warning --max-interval 600
     depends_on:
       - celery
+    
+  celery_worker_2:
+    <<: *celery
+    container_name: celery_worker_2
+    command: celery -A backend worker -l warning
+    ports: []
+
 
   rabbitmq:
     restart: on-failure
@@ -60,3 +67,5 @@ services:
 volumes:
   dev-db-data:
   dev-app-data:
+  dev-redis-data:
+
